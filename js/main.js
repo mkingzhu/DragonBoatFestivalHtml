@@ -173,6 +173,10 @@
     });
     bg.on("pressmove", function (a) {
       boat.x = x + (a.localX - lastX);
+      if (boat.x < 0)
+        boat.x = 0;
+      else if (boat.x > W)
+        boat.x = W;
     });
 
     var genRandom = function (i) {
