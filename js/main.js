@@ -189,8 +189,8 @@
         var money = new createjs.Bitmap(mainQueue.getResult("playFall" + num));
         money.regX = money.image.width / 2;
         money.regY = money.image.height / 2;
-        money.x = W / 8 + genRandom(3 * W / 4);
-        money.y = -genRandom(300);
+        money.x = W / 16 + genRandom(0.9375 * W);
+        money.y = -genRandom(H);
         money.visible = false;
         money.magic = num < 6 ? true : false;
         moneys[i].push(money);
@@ -203,16 +203,13 @@
       var needFast = texttime.getTimeRemainInSec() < 15 ? true : false;
       moneys[currentFall].forEach(function (element, index, array) {
         createjs.Tween.get(element).wait(currentFall == 0 ? 10 : genRandom(1500)).to({
+          x: W / 16 + genRandom(0.9375 * W),
+          y: -genRandom(H),
           visible: true
         }, 10).to({
-          y: H,
-          rotation: 720 + genRandom(400)
+          y: H
         }, needFast ? 2500 : 3500).to({
           visible: false
-        }, 10).to({
-          x: W / 8 + genRandom(3 * W / 4),
-          y: -genRandom(300),
-          rotation: 0
         }, 10);
       });
       if (currentFall < numFalls - 1)
@@ -222,7 +219,7 @@
     };
     var handler = setInterval(fall, 2E3);
 
-    var lastI = -1, lastJ = -1, score = 0;
+    var score = 0;
     var texttime = new basejs.TextTime(function () {
       clearInterval(handler);
       self.parent.removeChild(self), self.over(score, isPlay);
@@ -230,14 +227,12 @@
       for (var i = 0; i < numFalls; i++) {
         for (var j = 0; j < numMoneyEachFall; j++) {
           var money = moneys[i][j];
-          if (!money.magic)
+          if (!money.magic || !money.visible)
             continue;
-          if (money.y > H - boat.image.height - 20 && money.y < H) {
+          if (money.y > H - boat.image.height + 30 && money.y < H) {
             if (money.x > boat.x - 100 && money.x < boat.x + 200) {
-              if (i == lastI && j == lastJ)
-                return;
-              lastI = i;
-              lastJ = j;
+              createjs.Tween.removeTweens(money);
+              money.visible = false;
               score += 1;
               textscore.setScore(score);
               return;
