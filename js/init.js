@@ -51,11 +51,25 @@
     loading.y = 800;
     this.addChild(loading);
 
+    var timesup = false, loaded = false;
+    var timeInMilSec = 5000, timePassesInMilSec = 0;
+    var tick = function (interval) {
+      timePassesInMilSec += interval.delta;
+      gameLoadingText.setPercent(timePassesInMilSec / timeInMilSec);
+      if (timePassesInMilSec >= timeInMilSec) {
+        createjs.Ticker.removeEventListener("tick", tick);
+        timesup = true;
+        if (loaded)
+          self.parent.removeChild(self), gameMain();
+      }
+    };
+    createjs.Ticker.addEventListener("tick", tick);
+
     loadMain(function () {
-      self.parent.removeChild(self), gameMain();
-    }, function (progress) {
-      gameLoadingText.setPercent(progress);
-    });
+      loaded = true;
+      if (timesup)
+        self.parent.removeChild(self), gameMain();
+    }, function () {});
   }
   createjs.extend(GameInit, basejs.BaseContainer);
   basejs.GameInit = createjs.promote(GameInit, "BaseContainer");
