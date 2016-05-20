@@ -82,56 +82,89 @@
   basejs.TextScore = createjs.promote(TextScore, "BaseContainer");
 } ());
 (function () {
-  function GameOver(score, isPlay, play) {
+  function GameOver(score, isPlay, play, main) {
     this.BaseContainer_constructor();
     this.play = play || function () {};
+    this.main = main || function () {};
     var self = this;
 
     var bg = new createjs.Bitmap(mainQueue.getResult("bg"));
     this.addChild(bg);
 
+    var board  = new createjs.Bitmap(mainQueue.getResult("retryBoard"));
+    board.regX = board.image.width / 2;
+    board.x = W / 2;
+    board.y = 110;
+    this.addChild(board);
+
+    var first = Math.floor(score / 100);
+    var second = Math.floor((score % 100) / 10);
+    var third = Math.floor(score % 10);
+
+    var first1 = new createjs.Bitmap(mainQueue.getResult("retry" + first));
+    if (first > 0) {
+      first1.regX = first1.image.width / 2;
+      first1.x = 160;
+      first1.y = 440;
+      this.addChild(first1);
+    }
+    var second1 = new createjs.Bitmap(mainQueue.getResult("retry" + second));
+    if (second > 0 || first > 0) {
+      second1.regX = second1.image.width / 2;
+      second1.x = 220;
+      second1.y = 440;
+      this.addChild(second1);
+    }
+    var third1 = new createjs.Bitmap(mainQueue.getResult("retry" + third));
+    third1.regX = third1.image.width / 2;
+    third1.x = 280;
+    third1.y = 440;
+    this.addChild(third1);
+
     if (isPlay) {
-      var board  = new createjs.Bitmap(mainQueue.getResult("overBoard"));
-      board.regX = board.image.width / 2;
-      board.x = W / 2;
-      board.y = 110;
-      this.addChild(board);
+      var overOk = new createjs.Bitmap(mainQueue.getResult("overOk"));
+      overOk.regX = overOk.image.width / 2;
+      overOk.x = W / 2;
+      overOk.y = 710;
+      overOk.on('click', function (a) {
+        if (!isInApp) {
+          window.location.href = "http://www.4001113900.com/dapp_alpha.html";
+          return;
+        }
 
-      var ok  = new createjs.Bitmap(mainQueue.getResult("overOk"));
-      ok.regX = ok.image.width / 2;
-      ok.x = W / 2;
-      ok.y = 710;
-      this.addChild(ok);
+        app.onSubmit(score, function () {
+          board.visible = false;
+          first1.visible = false;
+          second1.visible = false;
+          third1.visible = false;
+          overOk.visible = false;
+
+          board  = new createjs.Bitmap(mainQueue.getResult("overBoard"));
+          board.regX = board.image.width / 2;
+          board.x = W / 2;
+          board.y = 110;
+          self.addChild(board);
+
+          var credit = new createjs.Bitmap(mainQueue.getResult("retry" + app.credit));
+          credit.regX = credit.image.width / 2;
+          credit.scaleX = 0.7;
+          credit.scaleY = 0.7;
+          credit.x = 340;
+          credit.y = 370;
+          self.addChild(credit);
+
+          overOk  = new createjs.Bitmap(mainQueue.getResult("overOk"));
+          overOk.regX = overOk.image.width / 2;
+          overOk.x = W / 2;
+          overOk.y = 710;
+          overOk.on('click', function (a) {
+            self.parent.removeChild(self), self.main();
+          });
+          self.addChild(overOk);
+        })
+      });
+      this.addChild(overOk);
     } else {
-      var board  = new createjs.Bitmap(mainQueue.getResult("retryBoard"));
-      board.regX = board.image.width / 2;
-      board.x = W / 2;
-      board.y = 110;
-      this.addChild(board);
-
-      var first = Math.floor(score / 100);
-      var second = Math.floor((score % 100) / 10);
-      var third = Math.floor(score % 10);
-      if (first > 0) {
-        var first1 = new createjs.Bitmap(mainQueue.getResult("retry" + first));
-        first1.regX = first1.image.width / 2;
-        first1.x = 160;
-        first1.y = 440;
-        this.addChild(first1);
-      }
-      if (second > 0 || first > 0) {
-        var second1 = new createjs.Bitmap(mainQueue.getResult("retry" + second));
-        second1.regX = second1.image.width / 2;
-        second1.x = 220;
-        second1.y = 440;
-        this.addChild(second1);
-      }
-      var third1 = new createjs.Bitmap(mainQueue.getResult("retry" + third));
-      third1.regX = third1.image.width / 2;
-      third1.x = 280;
-      third1.y = 440;
-      this.addChild(third1);
-
       var introStart = new createjs.Bitmap(mainQueue.getResult("introStart"));
       introStart.regX = introStart.image.width / 2;
       introStart.x = W / 2;
@@ -267,6 +300,33 @@
   basejs.GamePlay = createjs.promote(GamePlay, "BaseContainer");
 } ());
 (function () {
+  function GamePlayed(main) {
+    this.BaseContainer_constructor();
+    this.main = main || function () {};
+    var self = this;
+
+    var bg = new createjs.Bitmap(mainQueue.getResult("bg"));
+    this.addChild(bg);
+
+    var board  = new createjs.Bitmap(mainQueue.getResult("playBoard"));
+    board.regX = board.image.width / 2;
+    board.x = W / 2;
+    board.y = 210;
+    this.addChild(board);
+
+    var overOk = new createjs.Bitmap(mainQueue.getResult("overOk"));
+    overOk.regX = overOk.image.width / 2;
+    overOk.x = W / 2;
+    overOk.y = 750;
+    overOk.on('click', function (a) {
+      self.parent.removeChild(self), self.main(true);
+    });
+    this.addChild(overOk);
+  }
+  createjs.extend(GamePlayed, basejs.BaseContainer);
+  basejs.GamePlayed = createjs.promote(GamePlayed, "BaseContainer");
+} ());
+(function () {
   function GameIntro(play) {
     this.BaseContainer_constructor();
     this.play = play || function () {};
@@ -324,12 +384,17 @@
   basejs.GameMain = createjs.promote(GameMain, "BaseContainer");
 } ());
 var gameOver = function (score, isPlay) {
-  var gameover = new basejs.GameOver(score, isPlay, gamePlay);
+  var gameover = new basejs.GameOver(score, isPlay, gamePlay, gameMain);
   stage.addChild(gameover);
 }
 var gamePlay = function (isPlay) {
-  var gameplay = new basejs.GamePlay(isPlay, gameOver);
-  stage.addChild(gameplay);
+  if (isPlay && played) {
+    var gameplay = new basejs.GamePlayed(gameMain);
+    stage.addChild(gameplay);
+  } else {
+    var gameplay = new basejs.GamePlay(isPlay, gameOver);
+    stage.addChild(gameplay);
+  }
 }
 var gameIntro = function () {
   var gameintro = new basejs.GameIntro(gamePlay);

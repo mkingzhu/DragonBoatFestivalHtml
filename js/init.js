@@ -20,7 +20,7 @@
 
     this.setPercent = function (progress) {
       progress = Math.floor(progress * 100);
-      if (100 == progress) {
+      if (100 <= progress) {
         self.hide();
       } else {
         first.image = initQueue.getResult("init" + Math.floor(progress / 10));

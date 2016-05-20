@@ -31,19 +31,22 @@
       xhr.send(null);
     }
   };
-  app.onSubmit = function (success) {
+  app.onSubmit = function (score, success) {
     var data = {
       'entity' : {
-        'model' : app.paths
+        'model' : {
+          'score' : score
+        }
       }
     };
     ajax({
       type: 'POST',
-      url: 'api/waters',
+      url: 'api/users',
       data: JSON.stringify(data),
       success: function (data) {
-        app.id = data.entity.model;
-        app.initShare();
+        played = true;
+        app.score = score;
+        app.credit = data.entity.model.credit;
         success();
       }
     });

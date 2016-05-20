@@ -86,6 +86,10 @@ var mainImgs = {
       id: "introTry"
     },
     {
+      src: "played_board.png",
+      id: "playBoard"
+    },
+    {
       src: "play_0.png",
       id: "play0"
     },
